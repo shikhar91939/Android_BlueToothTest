@@ -1,14 +1,23 @@
 package com.example.bluetooth_jcg_1;
 
+
+import java.util.Set;
+
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +29,10 @@ public class MainActivity extends Activity {
 	private static final String TAG = "mylog";
 	private static TextView tv_BluetoothStatusHead; 
 	private static final int REQUEST_ENABLE_BT = 1;
+	private ArrayAdapter<String> list_blueToothArrayAdapter;
+	private ListView listView_bluetoothDevices;
+	private Set<BluetoothDevice> pairedDevices;
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +41,9 @@ public class MainActivity extends Activity {
         myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();// to check if Bluetooth adapter is on or off
         tv_BluetoothStatusHead = (TextView) findViewById(R.id.tv_BluetoothStatusHead);
         updateBTadapterStatusInUI();
+        list_blueToothArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+        listView_bluetoothDevices = (ListView)findViewById(R.id.listView_bluetoothDevices);
+        listView_bluetoothDevices.setAdapter(list_blueToothArrayAdapter);
     }
 
 	@Override
@@ -118,12 +134,29 @@ public class MainActivity extends Activity {
         		myBluetoothAdapter.cancelDiscovery();
         		Toast.makeText(getApplicationContext(), "Scan cancelled", Toast.LENGTH_SHORT);
         	}else{
-        		Log.d(TAG, "in function listDevices, strting discovery");
+        		Log.d(TAG, "in function listDevices, starting discovery");
+        		list_blueToothArrayAdapter.clear();
         		myBluetoothAdapter.startDiscovery();
 //        		button_discoverDevices.setText("Searching...");
+        		registerReceiver(broadcastReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
         	}
     	}
     }
+    
+    final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+	    public void onReceive(Context context, Intent intent) {
+	        String action = intent.getAction();
+	        // When discovery finds a device
+	        if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+	             // Get the BluetoothDevice object from the Intent
+	        	 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+	        	 // add the name and the MAC address of the object to the arrayAdapter
+	             list_blueToothArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+	             //create the object of the "list_..." (seen in the above line) in the onCreate menu
+	             list_blueToothArrayAdapter.notifyDataSetChanged();
+	        }
+	    }
+	};
     private void updateBTadapterStatusInUI() {
     	Log.d(TAG, "entered the function update BTadapterStatusInUI()");
     	if(myBluetoothAdapter.isEnabled()){
@@ -137,4 +170,25 @@ public class MainActivity extends Activity {
     		tv_BluetoothStatusHead.setText("BlueTooth Status: Unknown State");
     	}
 	}
+    
+    public void listPairedDevices(View view){
+    	list_blueToothArrayAdapter.clear();
+    	 // get paired devices 
+        pairedDevices = myBluetoothAdapter.getBondedDevices();
+        
+        // put it's one to the adapter
+        for(BluetoothDevice device : pairedDevices)
+        	list_blueToothArrayAdapter.add(device.getName()+ "\n" + device.getAddress());
+
+        Toast.makeText(getApplicationContext(),"Show Paired Devices",
+      		  Toast.LENGTH_SHORT).show();
+    }
+    
+    // unregiater reciever to save battery
+    @Override
+    protected void onDestroy() {
+ 	   // TODO Auto-generated method stub
+ 	   super.onDestroy();
+ 	   unregisterReceiver(broadcastReceiver);
+    }
 }

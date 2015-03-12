@@ -8,19 +8,19 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.bluetooth_jcg_1.MainActivity" >
 
+    
     <TextView
         android:id="@+id/tv_BluetoothStatusHead"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="BlueTooth Status: " />
-    
     <Button
         android:id="@+id/button_checkBluetoothStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_BluetoothStatusHead"
         android:onClick="checkBluetoothStatus"
-        android:layout_margin="10dp"
+        android:layout_margin="5dp"
         android:text="Check Status"/>
     
     <Button 
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
 		android:onClick="switchOn"
 		android:layout_below="@id/button_checkBluetoothStatus"
-		android:layout_margin="10dp"
+		android:layout_margin="5dp"
 		android:text="ON"/>
     <Button 
         android:id="@+id/button_BluetoothSwitchOff"
@@ -38,16 +38,35 @@
 		android:onClick="switchOff"
 		android:layout_below="@id/button_checkBluetoothStatus"
 		android:layout_toRightOf="@id/button_BluetoothSwitchOn"
-		android:layout_margin="10dp"
+		android:layout_margin="5dp"
 		android:text="OFF"/>
-    
+    <Button 
+        android:id="@+id/button_showPairedDevices"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+		android:onClick="listPairedDevices"
+		android:layout_below="@id/button_BluetoothSwitchOn"
+		
+		android:layout_margin="5dp"
+		android:text="Show paired devices"/>
     <Button 
         android:id="@+id/button_discoverDevices"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
 		android:onClick="listDevicesInRange"
-		android:layout_below="@id/button_BluetoothSwitchOn"
-		android:layout_alignLeft="@id/button_BluetoothSwitchOn"
-		android:layout_margin="10dp"
-		android:text="Search devices in range (stock)"/>
+		android:layout_below="@id/button_showPairedDevices"
+		
+		android:layout_margin="5dp"
+		android:text="Search devices in range"/>
+    
+    <ListView
+       android:id="@+id/listView_bluetoothDevices"
+       android:layout_width="fill_parent"
+       android:layout_below="@+id/button_discoverDevices"
+       android:layout_height="200dp" >
+	</ListView>
+	
+	
+	
+	
 </RelativeLayout>
